@@ -7,16 +7,16 @@ const GEOM_COMMAND_CLOSE_PATH: u32 = 7;
 const GEOM_COMMAND_MOVE_TO_WITH_COUNT1: u32 = 1 << 3 | GEOM_COMMAND_MOVE_TO;
 const GEOM_COMMAND_CLOSE_PATH_WITH_COUNT1: u32 = 1 << 3 | GEOM_COMMAND_CLOSE_PATH;
 
+/// Utility for encoding MVT geometries.
 pub struct GeometryEncoder {
     buf: Vec<u32>,
     prev_x: i16,
     prev_y: i16,
 }
 
-/// Utility for encoding MVT geometries.
 impl GeometryEncoder {
-    // TODO: with_capacity
     pub fn new() -> Self {
+        // TODO: with_capacity?
         Self {
             buf: Vec::new(),
             prev_x: 0,
@@ -24,6 +24,7 @@ impl GeometryEncoder {
         }
     }
 
+    /// Consumes the encoder and returns the encoded geometry.
     #[inline]
     pub fn into_vec(self) -> Vec<u32> {
         self.buf

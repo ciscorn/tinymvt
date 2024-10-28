@@ -1,5 +1,3 @@
-//! Tag (attribute) encoder for MVT.
-
 use ahash::RandomState;
 use indexmap::IndexSet;
 
@@ -18,8 +16,14 @@ impl TagsEncoder {
         Default::default()
     }
 
+    /// Adds a key-value pair for the current feature.
     #[inline]
-    pub fn add(&mut self, key: &str, value: Value) {
+    pub fn add(&mut self, key: &str, value: impl Into<Value>) {
+        self.add_inner(key, value.into());
+    }
+
+    #[inline]
+    fn add_inner(&mut self, key: &str, value: Value) {
         let key_idx = match self.keys.get_index_of(key) {
             None => self.keys.insert_full(key.to_string()).0,
             Some(idx) => idx,
@@ -31,11 +35,13 @@ impl TagsEncoder {
         self.tags.extend([key_idx as u32, value_idx as u32]);
     }
 
+    /// Takes the key-value index buffer for the current feature.
     #[inline]
-    pub fn flush_tags(&mut self) -> Vec<u32> {
+    pub fn take_tags(&mut self) -> Vec<u32> {
         std::mem::take(&mut self.tags)
     }
 
+    /// Consumes the encoder and returns the keys and values for a layer.
     #[inline]
     pub fn into_keys_and_values(self) -> (Vec<String>, Vec<tile::Value>) {
         let keys = self.keys.into_iter().collect();
@@ -48,12 +54,7 @@ impl TagsEncoder {
     }
 }
 
-pub struct KeysAndValues {
-    pub keys: Vec<String>,
-    pub values: Vec<tile::Value>,
-}
-
-/// Wrapper for MVT values
+/// Comparable wrapper for the MVT values.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Value {
     String(String),
@@ -162,34 +163,34 @@ mod test {
     #[test]
     fn tags_encoder() {
         let mut encoder = TagsEncoder::new();
-        encoder.add("k0", "v0".into());
-        encoder.add("k0", "v0".into());
-        encoder.add("k1", "v0".into());
-        encoder.add("k1", "v1".into());
-        assert_eq!(encoder.flush_tags(), [0, 0, 0, 0, 1, 0, 1, 1]);
+        encoder.add("k0", "v0");
+        encoder.add("k0", "v0");
+        encoder.add("k1", "v0");
+        encoder.add("k1", "v1");
+        assert_eq!(encoder.take_tags(), [0, 0, 0, 0, 1, 0, 1, 1]);
 
-        encoder.add("k0", "v0".into());
-        encoder.add("k0", "v2".into());
-        encoder.add("k1", "v2".into());
-        encoder.add("k2", "v0".to_string().into());
-        encoder.add("k1", "v1".into());
-        encoder.add("k1", "v1".to_string().into());
-        assert_eq!(encoder.flush_tags(), [0, 0, 0, 2, 1, 2, 2, 0, 1, 1, 1, 1]);
+        encoder.add("k0", "v0");
+        encoder.add("k0", "v2");
+        encoder.add("k1", "v2");
+        encoder.add("k2", "v0".to_string());
+        encoder.add("k1", "v1");
+        encoder.add("k1", "v1".to_string());
+        assert_eq!(encoder.take_tags(), [0, 0, 0, 2, 1, 2, 2, 0, 1, 1, 1, 1]);
 
-        encoder.add("k1", 10i32.into());
-        encoder.add("k2", 10.5f64.into());
-        encoder.add("k3", 10u32.into());
-        encoder.add("k3", (-10i32).into());
-        encoder.add("k3", true.into());
-        encoder.add("k3", 1.into());
-        encoder.add("k2", 10.5f32.into());
-        encoder.add("k4", 10.5f64.into());
-        encoder.add("k3", (-10i64).into());
-        encoder.add("k3", 10u64.into());
+        encoder.add("k1", 10i32);
+        encoder.add("k2", 10.5f64);
+        encoder.add("k3", 10u32);
+        encoder.add("k3", -10i32);
+        encoder.add("k3", true);
+        encoder.add("k3", 1);
+        encoder.add("k2", 10.5f32);
+        encoder.add("k4", 10.5f64);
+        encoder.add("k3", -10i64);
+        encoder.add("k3", 10u64);
         encoder.add("k5", Value::Int(11));
-        encoder.add("k5", 12i64.into());
+        encoder.add("k5", 12i64);
         assert_eq!(
-            encoder.flush_tags(),
+            encoder.take_tags(),
             [1, 3, 2, 4, 3, 3, 3, 5, 3, 6, 3, 7, 2, 8, 4, 4, 3, 5, 3, 3, 5, 9, 5, 10]
         );
 
