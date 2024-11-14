@@ -15,3 +15,6 @@ Includes the following utilities:
 - Conversion between Web Mercator and geographic coordinates
 - Conversion between linear tile IDs (PMTiles-compliant Hilbert IDs) and XYZ tile coordinates
 
+## Authors
+
+- Taku Fukada ([@ciscorn](https://github.com/ciscorn)) - original author
