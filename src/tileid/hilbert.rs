@@ -1,35 +1,34 @@
-//! Tile ID conversion based on Hilbert curve (compliant with PMTiles)
+//! Tile ID based on Hilbert curve (compliant with PMTiles)
 
 pub fn id_to_zxy(id: u64) -> (u8, u32, u32) {
     let z = (((u64::BITS - (3 * id + 1).leading_zeros()) - 1) / 2) as u8;
     let acc = ((1 << (z * 2)) - 1) / 3;
     let mut pos = id - acc;
-    let (tx, ty) = (0..z).fold((0, 0), |(tx, ty), a| {
-        let rx = (pos / 2) & 1;
-        let ry = (pos ^ rx) & 1;
-        let s = 1 << a;
-        let (tx, ty) = rotate(s, tx, ty, rx, ry);
-        pos /= 4;
-        (tx + s * rx, ty + s * ry)
+    let (x, y) = (0..z).fold((0, 0), |(x, y), a| {
+        let s = 1u32 << a;
+        let rx = s & (pos as u32 >> 1);
+        let ry = s & (pos as u32 ^ rx);
+        let (x, y) = rotate(s, x, y, rx, ry);
+        pos >>= 1;
+        (x + rx, y + ry)
     });
-    (z, tx as u32, ty as u32)
+    (z, x, y)
 }
 
-pub fn zxy_to_id(z: u8, x: u32, y: u32) -> u64 {
+pub fn zxy_to_id(z: u8, mut x: u32, mut y: u32) -> u64 {
     let acc = ((1 << (z * 2)) - 1) / 3;
-    let (mut tx, mut ty) = (x as u64, y as u64);
     (0..z).rev().fold(acc, |acc, a| {
-        let rx = (tx >> a) & 1;
-        let ry = (ty >> a) & 1;
         let s = 1 << a;
-        (tx, ty) = rotate(s, tx, ty, rx, ry);
-        acc + s * s * ((3 * rx) ^ ry)
+        let rx = s & x;
+        let ry = s & y;
+        (x, y) = rotate(s, x, y, rx, ry);
+        acc + ((((3 * rx) ^ ry) as u64) << a)
     })
 }
 
-const fn rotate(n: u64, mut x: u64, mut y: u64, rx: u64, ry: u64) -> (u64, u64) {
+const fn rotate(n: u32, mut x: u32, mut y: u32, rx: u32, ry: u32) -> (u32, u32) {
     if ry == 0 {
-        if rx == 1 {
+        if rx != 0 {
             x = (n - 1).wrapping_sub(x);
             y = (n - 1).wrapping_sub(y);
         }
@@ -68,6 +67,8 @@ mod tests {
             ((4, 15, 0), 340),
             // z = 18 (tileId exceeds u32)
             ((18, 1, 1), 22906492247),
+            // z = 31
+            ((31, 100, 100), 1537228672809139573),
         ];
 
         for ((x, y, z), expected_tile_id) in fixture {
