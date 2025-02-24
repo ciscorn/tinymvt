@@ -1,4 +1,4 @@
-use ahash::RandomState;
+use foldhash::fast::RandomState;
 use indexmap::IndexSet;
 
 use crate::vector_tile::tile;
