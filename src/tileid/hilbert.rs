@@ -1,6 +1,6 @@
 //! Tile ID based on Hilbert curve (compliant with PMTiles)
 
-pub fn id_to_zxy(id: u64) -> (u8, u32, u32) {
+pub fn hilbert_to_zxy(id: u64) -> (u8, u32, u32) {
     let z = (((u64::BITS - (3 * id + 1).leading_zeros()) - 1) / 2) as u8;
     let acc = ((1 << (z * 2)) - 1) / 3;
     let mut pos = id - acc;
@@ -15,7 +15,7 @@ pub fn id_to_zxy(id: u64) -> (u8, u32, u32) {
     (z, x, y)
 }
 
-pub fn zxy_to_id(z: u8, mut x: u32, mut y: u32) -> u64 {
+pub fn zxy_to_hilbert(z: u8, mut x: u32, mut y: u32) -> u64 {
     let acc = ((1 << (z * 2)) - 1) / 3;
     (0..z).rev().fold(acc, |acc, a| {
         let s = 1 << a;
@@ -72,9 +72,9 @@ mod tests {
         ];
 
         for ((x, y, z), expected_tile_id) in fixture {
-            let tile_id = zxy_to_id(x, y, z);
+            let tile_id = zxy_to_hilbert(x, y, z);
             assert_eq!(tile_id, expected_tile_id);
-            assert_eq!(id_to_zxy(tile_id), (x, y, z));
+            assert_eq!(hilbert_to_zxy(tile_id), (x, y, z));
         }
     }
 }
