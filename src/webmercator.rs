@@ -43,6 +43,14 @@ pub fn web_mercator_meters_to_lnglat(mx: f64, my: f64) -> (f64, f64) {
     (lng, lat)
 }
 
+/// Calculates the tile coordinates (z, x, y) from the zoom level and geographic coordinates (lng, lat).
+pub fn lnglat_to_zxy(z: u8, lng: f64, lat: f64) -> (u8, u32, u32) {
+    let (mx, my) = lnglat_to_web_mercator(lng, lat);
+    let x = (mx * (1 << z) as f64) as u32;
+    let y = (my * (1 << z) as f64) as u32;
+    (z, x, y)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -111,5 +119,17 @@ mod tests {
         println!("{}", CIRCUMFERENCE / 2.);
         assert!((mx - CIRCUMFERENCE / 2.).abs() < 1e-7);
         assert!((my - CIRCUMFERENCE / 2.).abs() < 1e-7);
+    }
+
+    #[test]
+    fn test_lnglat_to_zxy() {
+        assert_eq!(
+            lnglat_to_zxy(13, 138.28421421786732, 37.153461188900344),
+            (13, 7242, 3184)
+        );
+        assert_eq!(
+            lnglat_to_zxy(13, 138.322514014752, 37.108119251859506),
+            (13, 7243, 3185)
+        );
     }
 }
