@@ -1,21 +1,48 @@
+//! Tags (attributes) encoder for MVT.
+
+use std::hash::BuildHasher;
+
 use foldhash::fast::RandomState;
 use indexmap::IndexSet;
 
 use crate::vector_tile::tile;
 
-#[derive(Default)]
-pub struct TagsEncoder {
-    keys: IndexSet<String, RandomState>,
-    values: IndexSet<Value, RandomState>,
+/// Utility for encoding MVT tags (attributes).
+pub struct TagsEncoder<S = RandomState> {
+    keys: IndexSet<String, S>,
+    values: IndexSet<Value, S>,
     tags: Vec<u32>,
 }
 
-/// Utility for encoding MVT tags (attributes).
 impl TagsEncoder {
+    /// Creates a new encoder with a default hasher.
+    #[inline]
     pub fn new() -> Self {
-        Default::default()
+        Self::default()
     }
+}
 
+impl<S: Default> Default for TagsEncoder<S> {
+    fn default() -> Self {
+        Self {
+            keys: IndexSet::default(),
+            values: IndexSet::default(),
+            tags: Vec::default(),
+        }
+    }
+}
+
+impl<S: BuildHasher + Clone> TagsEncoder<S> {
+    pub fn with_hasher(hasher: S) -> Self {
+        Self {
+            keys: IndexSet::with_hasher(hasher.clone()),
+            values: IndexSet::with_hasher(hasher),
+            tags: Vec::default(),
+        }
+    }
+}
+
+impl<S: BuildHasher> TagsEncoder<S> {
     /// Adds a key-value pair for the current feature.
     #[inline]
     pub fn add(&mut self, key: &str, value: impl Into<Value>) {
@@ -245,5 +272,11 @@ mod test {
                 },
             ]
         );
+    }
+
+    #[test]
+    pub fn with_hasher() {
+        let rs = std::hash::RandomState::new();
+        let _ = TagsEncoder::with_hasher(rs);
     }
 }

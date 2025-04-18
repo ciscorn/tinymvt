@@ -2,12 +2,14 @@
 
 use std::f64::consts::{FRAC_PI_2, TAU};
 
+use crate::TileZXY;
+
 const A: f64 = 6378137.;
 const CIRCUMFERENCE: f64 = A * TAU;
 
 /// Converts geographic coordinate (lng, lat) to Web Mercator coordinate (mx, my) normalized.
 ///
-/// The range of (mx, my) is [0.0, 0.0]-[1.0, 1.0] (same as Mapbox/MapLibre API, etc.)
+/// The range of (mx, my) is [0.0, 0.0]-[1.0, 1.0] (same as Mapbox/MapLibre API)
 pub fn lnglat_to_web_mercator(lng: f64, lat: f64) -> (f64, f64) {
     let mx = (lng + 180.0) / 360.0;
     let my = ((90.0 + lat).to_radians() / 2.0).tan().ln().to_degrees();
@@ -17,7 +19,7 @@ pub fn lnglat_to_web_mercator(lng: f64, lat: f64) -> (f64, f64) {
 
 /// Converts Web Mercator coordinate (mx, my) normalized to geographic coordinate (lng, lat).
 ///
-/// The range of (mx, my) is [0.0, 0.0]-[1.0, 1.0] (same as Mapbox/MapLibre API, etc.)
+/// The range of (mx, my) is [0.0, 0.0]-[1.0, 1.0] (same as Mapbox/MapLibre API)
 pub fn web_mercator_to_lnglat(mx: f64, my: f64) -> (f64, f64) {
     let lng = mx * 360.0 - 180.0;
     let lat = my * 360.0 - 180.0;
@@ -43,12 +45,19 @@ pub fn web_mercator_meters_to_lnglat(mx: f64, my: f64) -> (f64, f64) {
     (lng, lat)
 }
 
-/// Calculates the tile coordinates (z, x, y) from the zoom level and geographic coordinates (lng, lat).
-pub fn lnglat_to_zxy(z: u8, lng: f64, lat: f64) -> (u8, u32, u32) {
-    let (mx, my) = lnglat_to_web_mercator(lng, lat);
+/// Calculates the tile coordinates (z, x, y) from the zoom level and Web Mercator coordinates (mx, my).
+///
+/// The range of (mx, my) is [0.0, 0.0]-[1.0, 1.0] (same as Mapbox/MapLibre API)
+pub fn web_mercator_to_zxy(z: u8, mx: f64, my: f64) -> TileZXY {
     let x = (mx * (1 << z) as f64) as u32;
     let y = (my * (1 << z) as f64) as u32;
     (z, x, y)
+}
+
+/// Calculates the tile coordinates (z, x, y) from the zoom level and geographic coordinates (lng, lat).
+pub fn lnglat_to_zxy(z: u8, lng: f64, lat: f64) -> TileZXY {
+    let (mx, my) = lnglat_to_web_mercator(lng, lat);
+    web_mercator_to_zxy(z, mx, my)
 }
 
 #[cfg(test)]
@@ -131,5 +140,8 @@ mod tests {
             lnglat_to_zxy(13, 138.322514014752, 37.108119251859506),
             (13, 7243, 3185)
         );
+        assert_eq!(web_mercator_to_zxy(13, 0., 0.), (13, 0, 0));
+        assert_eq!(web_mercator_to_zxy(13, 0.5, 1.), (13, 1 << 12, 1 << 13));
+        assert_eq!(web_mercator_to_zxy(13, 1., 0.5), (13, 1 << 13, 1 << 12));
     }
 }
