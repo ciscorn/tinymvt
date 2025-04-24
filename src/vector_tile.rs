@@ -85,6 +85,7 @@ pub mod tile {
         ///
         /// The values are not transformed in any way and thus are considered stable
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        #[inline]
         pub fn as_str_name(&self) -> &'static str {
             match self {
                 Self::Unknown => "UNKNOWN",
@@ -94,6 +95,7 @@ pub mod tile {
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
+        #[inline]
         pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
             match value {
                 "UNKNOWN" => Some(Self::Unknown),

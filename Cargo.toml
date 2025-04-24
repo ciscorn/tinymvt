@@ -1,7 +1,7 @@
 [package]
 name = "tinymvt"
-version = "0.2.2"
-edition = "2021"
+version = "0.2.3"
+edition = "2024"
 license = "MIT"
 repository = "https://github.com/ciscorn/tinymvt"
 description = "A lightweight library for encoding Mapbox Vector Tiles (MVT)"

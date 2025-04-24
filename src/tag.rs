@@ -23,6 +23,7 @@ impl TagsEncoder {
 }
 
 impl<S: Default> Default for TagsEncoder<S> {
+    #[inline]
     fn default() -> Self {
         Self {
             keys: IndexSet::default(),
@@ -33,6 +34,7 @@ impl<S: Default> Default for TagsEncoder<S> {
 }
 
 impl<S: BuildHasher + Clone> TagsEncoder<S> {
+    #[inline]
     pub fn with_hasher(hasher: S) -> Self {
         Self {
             keys: IndexSet::with_hasher(hasher.clone()),
@@ -94,6 +96,7 @@ pub enum Value {
 }
 
 impl Value {
+    #[inline]
     pub fn into_tile_value(self) -> tile::Value {
         use Value::*;
         match self {
@@ -130,26 +133,31 @@ impl Value {
 }
 
 impl From<&str> for Value {
+    #[inline]
     fn from(v: &str) -> Self {
         Value::String(v.to_string())
     }
 }
 impl From<String> for Value {
+    #[inline]
     fn from(v: String) -> Self {
         Value::String(v)
     }
 }
 impl From<u64> for Value {
+    #[inline]
     fn from(v: u64) -> Self {
         Value::Uint(v)
     }
 }
 impl From<u32> for Value {
+    #[inline]
     fn from(v: u32) -> Self {
         Value::Uint(v as u64)
     }
 }
 impl From<i64> for Value {
+    #[inline]
     fn from(v: i64) -> Self {
         if v >= 0 {
             Value::Uint(v as u64)
@@ -159,6 +167,7 @@ impl From<i64> for Value {
     }
 }
 impl From<i32> for Value {
+    #[inline]
     fn from(v: i32) -> Self {
         if v >= 0 {
             Value::Uint(v as u64)
@@ -168,16 +177,19 @@ impl From<i32> for Value {
     }
 }
 impl From<f32> for Value {
+    #[inline]
     fn from(v: f32) -> Self {
         Value::Float(v.to_ne_bytes())
     }
 }
 impl From<f64> for Value {
+    #[inline]
     fn from(v: f64) -> Self {
         Value::Double(v.to_ne_bytes())
     }
 }
 impl From<bool> for Value {
+    #[inline]
     fn from(v: bool) -> Self {
         Value::Bool(v)
     }

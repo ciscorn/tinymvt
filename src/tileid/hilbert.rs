@@ -1,5 +1,6 @@
 //! Tile ID based on Hilbert curve (compliant with PMTiles)
 
+#[inline]
 pub fn hilbert_to_zxy(id: u64) -> (u8, u32, u32) {
     let z = (((u64::BITS - (3 * id + 1).leading_zeros()) - 1) / 2) as u8;
     let acc = ((1 << (z * 2)) - 1) / 3;
@@ -15,6 +16,7 @@ pub fn hilbert_to_zxy(id: u64) -> (u8, u32, u32) {
     (z, x, y)
 }
 
+#[inline]
 pub fn zxy_to_hilbert(z: u8, mut x: u32, mut y: u32) -> u64 {
     let acc = ((1 << (z * 2)) - 1) / 3;
     (0..z).rev().fold(acc, |acc, a| {
@@ -26,6 +28,7 @@ pub fn zxy_to_hilbert(z: u8, mut x: u32, mut y: u32) -> u64 {
     })
 }
 
+#[inline]
 const fn rotate(n: u32, mut x: u32, mut y: u32, rx: u32, ry: u32) -> (u32, u32) {
     if ry == 0 {
         if rx != 0 {

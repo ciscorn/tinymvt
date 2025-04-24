@@ -10,6 +10,7 @@ const CIRCUMFERENCE: f64 = A * TAU;
 /// Converts geographic coordinate (lng, lat) to Web Mercator coordinate (mx, my) normalized.
 ///
 /// The range of (mx, my) is [0.0, 0.0]-[1.0, 1.0] (same as Mapbox/MapLibre API)
+#[inline]
 pub fn lnglat_to_web_mercator(lng: f64, lat: f64) -> (f64, f64) {
     let mx = (lng + 180.0) / 360.0;
     let my = ((90.0 + lat).to_radians() / 2.0).tan().ln().to_degrees();
@@ -20,6 +21,7 @@ pub fn lnglat_to_web_mercator(lng: f64, lat: f64) -> (f64, f64) {
 /// Converts Web Mercator coordinate (mx, my) normalized to geographic coordinate (lng, lat).
 ///
 /// The range of (mx, my) is [0.0, 0.0]-[1.0, 1.0] (same as Mapbox/MapLibre API)
+#[inline]
 pub fn web_mercator_to_lnglat(mx: f64, my: f64) -> (f64, f64) {
     let lng = mx * 360.0 - 180.0;
     let lat = my * 360.0 - 180.0;
@@ -30,6 +32,7 @@ pub fn web_mercator_to_lnglat(mx: f64, my: f64) -> (f64, f64) {
 /// Converts geographic coordinate (lng, lat) to Web Mercator coordinate (mx, my) in meters.
 ///
 /// The range of (mx, my) is [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244]
+#[inline]
 pub fn lnglat_to_web_mercator_meters(lng: f64, lat: f64) -> (f64, f64) {
     let mx = lng / 360.0 * CIRCUMFERENCE;
     let my = ((90.0 + lat).to_radians() / 2.0).tan().ln() * A;
@@ -39,6 +42,7 @@ pub fn lnglat_to_web_mercator_meters(lng: f64, lat: f64) -> (f64, f64) {
 /// Converts Web Mercator coordinate (mx, my) in meters to geographic coordinate (lng, lat).
 ///
 /// The range of (mx, my) is [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244]
+#[inline]
 pub fn web_mercator_meters_to_lnglat(mx: f64, my: f64) -> (f64, f64) {
     let lng = mx / CIRCUMFERENCE * 360.0;
     let lat = (2.0 * (my / A).exp().atan()).to_degrees() - 90.0;
@@ -48,6 +52,7 @@ pub fn web_mercator_meters_to_lnglat(mx: f64, my: f64) -> (f64, f64) {
 /// Calculates the tile coordinates (z, x, y) from the zoom level and Web Mercator coordinates (mx, my).
 ///
 /// The range of (mx, my) is [0.0, 0.0]-[1.0, 1.0] (same as Mapbox/MapLibre API)
+#[inline]
 pub fn web_mercator_to_zxy(z: u8, mx: f64, my: f64) -> TileZXY {
     let x = (mx * (1 << z) as f64) as u32;
     let y = (my * (1 << z) as f64) as u32;
@@ -55,6 +60,7 @@ pub fn web_mercator_to_zxy(z: u8, mx: f64, my: f64) -> TileZXY {
 }
 
 /// Calculates the tile coordinates (z, x, y) from the zoom level and geographic coordinates (lng, lat).
+#[inline]
 pub fn lnglat_to_zxy(z: u8, lng: f64, lat: f64) -> TileZXY {
     let (mx, my) = lnglat_to_web_mercator(lng, lat);
     web_mercator_to_zxy(z, mx, my)

@@ -15,6 +15,7 @@ pub struct GeometryEncoder {
 }
 
 impl GeometryEncoder {
+    #[inline]
     pub fn new() -> Self {
         // TODO: with_capacity?
         Self {
