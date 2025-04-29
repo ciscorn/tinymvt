@@ -74,10 +74,10 @@ mod tests {
             ((31, 100, 100), 1537228672809139573),
         ];
 
-        for ((x, y, z), expected_tile_id) in fixture {
-            let tile_id = zxy_to_hilbert(x, y, z);
+        for ((z, x, y), expected_tile_id) in fixture {
+            let tile_id = zxy_to_hilbert(z, x, y);
             assert_eq!(tile_id, expected_tile_id);
-            assert_eq!(hilbert_to_zxy(tile_id), (x, y, z));
+            assert_eq!(hilbert_to_zxy(tile_id), (z, x, y));
         }
     }
 }
