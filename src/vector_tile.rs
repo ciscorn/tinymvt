@@ -27,7 +27,7 @@ pub mod tile {
         pub bool_value: ::core::option::Option<bool>,
     }
     /// Features are described in section 4.2 of the specification
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
     pub struct Feature {
         #[prost(uint64, optional, tag = "1", default = "0")]
         pub id: ::core::option::Option<u64>,
@@ -72,7 +72,17 @@ pub mod tile {
         pub extent: ::core::option::Option<u32>,
     }
     /// GeomType is described in section 4.3.4 of the specification
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[derive(
+        Clone,
+        Copy,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash,
+        PartialOrd,
+        Ord,
+        ::prost::Enumeration
+    )]
     #[repr(i32)]
     pub enum GeomType {
         Unknown = 0,
@@ -85,7 +95,6 @@ pub mod tile {
         ///
         /// The values are not transformed in any way and thus are considered stable
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        #[inline]
         pub fn as_str_name(&self) -> &'static str {
             match self {
                 Self::Unknown => "UNKNOWN",
@@ -95,7 +104,6 @@ pub mod tile {
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
-        #[inline]
         pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
             match value {
                 "UNKNOWN" => Some(Self::Unknown),
