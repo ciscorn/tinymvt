@@ -1,13 +1,14 @@
 [package]
 name = "tinymvt"
-version = "0.2.4"
+authors = ["Taku Fukada <naninunenor@gmail.com>", "asrcpq"]
+version = "0.3.0"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/ciscorn/tinymvt"
-description = "A lightweight library for encoding Mapbox Vector Tiles (MVT)"
+description = "A lightweight library for encoding and decoding Mapbox Vector Tiles (MVT)"
 
 [dependencies]
-foldhash = "0.1.5"
+foldhash = "0.2.0"
 indexmap = "2.9.0"
 prost = "0.14.0"
 
