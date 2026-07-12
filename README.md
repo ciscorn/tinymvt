@@ -1,5 +1,11 @@
 # tinymvt-rs
 
+> [!NOTE]
+> This crate is no longer maintained. Consider using
+> [fast-mvt](https://github.com/nyurik/fast-mvt) instead.
+
+---
+
 [![codecov](https://codecov.io/gh/ciscorn/tinymvt/graph/badge.svg?token=HSPd9MRmxC)](https://codecov.io/gh/ciscorn/tinymvt)
 ![Crates.io Version](https://img.shields.io/crates/v/tinymvt)
 
